@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Youth Opportunity Explorer</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Youth Opportunity Explorer</h1>
+            <p class="author">Created by Athar</p>
+            <p class="metadata">
+                Data Year: 2023 | 
+                Data Source: <a href="https://ourworldindata.org" target="_blank">Our World in Data</a>
+                (GDP per Capita: World Bank, Youth Unemployment: ILO/World Bank)
+            </p>
+            <p class="description">
+                Explore economic opportunity and job markets for young people across the world. 
+                This visualization helps those considering moving to a new country after graduation.
+            </p>
+        </header>
+
+        <div class="visualizations">
+            <!-- Histogram 1: GDP per Capita -->
+            <div class="viz-container">
+                <h2>Distribution of GDP per Capita</h2>
+                <svg id="gdp-histogram"></svg>
+            </div>
+
+            <!-- Histogram 2: Youth Unemployment -->
+            <div class="viz-container">
+                <h2>Distribution of Youth Unemployment Rate</h2>
+                <svg id="unemployment-histogram"></svg>
+            </div>
+
+            <!-- Scatterplot: Correlation -->
+            <div class="viz-container full-width">
+                <h2>GDP per Capita vs Youth Unemployment Rate</h2>
+                <svg id="correlation-scatterplot"></svg>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
