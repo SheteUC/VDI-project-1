@@ -110,6 +110,44 @@ h1 {
     box-shadow: 0 0 0 3px rgba(70, 130, 180, 0.1);
 }
 
+.clear-btn {
+    padding: 10px 20px;
+    font-size: 1em;
+    background-color: #4682B4;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    min-width: 200px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.clear-btn:hover {
+    background-color: #2c5282;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.clear-btn:active {
+    transform: translateY(1px);
+}
+
+.selection-info {
+    text-align: center;
+    padding: 12px;
+    background-color: #e3f2fd;
+    border: 2px solid #4682B4;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 0.95em;
+    color: #2c3e50;
+}
+
+.selection-info #selection-count {
+    font-weight: 600;
+    color: #4682B4;
+}
+
 .visualizations {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -167,6 +205,37 @@ svg {
 .dot:hover {
     opacity: 1;
     r: 6;
+}
+
+/* Selection states for brushing */
+.country.dimmed {
+    opacity: 0.2;
+    fill: #ccc !important;
+}
+
+.country.selected {
+    opacity: 1;
+    stroke: #ff6b6b;
+    stroke-width: 2px;
+}
+
+.bar.dimmed {
+    opacity: 0.2;
+}
+
+.bar.selected {
+    opacity: 1;
+}
+
+.dot.dimmed {
+    opacity: 0.15;
+    fill: #ccc;
+}
+
+.dot.selected {
+    opacity: 1;
+    stroke: #ff6b6b;
+    stroke-width: 2px;
 }
 
 .axis {
@@ -240,4 +309,13 @@ svg {
     font-size: 12px;
     font-weight: 600;
     fill: #333;
+}
+
+/* Brush styling */
+.brush .selection {
+    fill: #4682B4;
+    fill-opacity: 0.2;
+    stroke: #4682B4;
+    stroke-width: 2px;
+    stroke-dasharray: 4;
 }

@@ -2,6 +2,7 @@ let globalData = null;
 let worldGeo = null;
 let currentAttr1 = 'gdp_per_capita';
 let currentAttr2 = 'youth_unemployment';
+let selectedCountries = new Set(); // Track selected countries for brushing
 
 const attributeConfig = {
     gdp_per_capita: {
@@ -78,10 +79,27 @@ Promise.all([
         updateVisualizations();
     });
 
+    // clear selection button
+    d3.select('#clear-selection').on('click', function() {
+        selectedCountries.clear();
+        updateVisualizations();
+    });
+
     updateVisualizations();
 });
 
 function updateVisualizations() {
+    const selectionInfo = d3.select('#selection-info');
+    const selectionCount = d3.select('#selection-count');
+    
+    if (selectedCountries.size > 0) {
+        selectionInfo.style('display', 'block');
+        selectionCount.text(`${selectedCountries.size} ${selectedCountries.size === 1 ? 'country' : 'countries'} selected`);
+    } else {
+        selectionInfo.style('display', 'none');
+    }
+
+    // clear all visualizations
     d3.select('#map1').selectAll('*').remove();
     d3.select('#map2').selectAll('*').remove();
     d3.select('#histogram1').selectAll('*').remove();
@@ -136,15 +154,28 @@ function createChoroplethMap(selector, geoData, dataByCode, countryByCode, confi
     const colorScale = d3.scaleSequential(config.colorScheme)
         .domain([0, d3.max(Array.from(dataByCode.values()))]);
 
+    // countries
     svg.selectAll('path')
         .data(geoData.features)
         .enter()
         .append('path')
-        .attr('class', 'country')
+        .attr('class', d => {
+            if (selectedCountries.size === 0) return 'country';
+            return selectedCountries.has(d.id) ? 'country selected' : 'country dimmed';
+        })
         .attr('d', path)
         .attr('fill', d => {
             const value = dataByCode.get(d.id);
             return value ? colorScale(value) : '#ccc';
+        })
+        .on('click', function(event, d) {
+            // toggle selection
+            if (selectedCountries.has(d.id)) {
+                selectedCountries.delete(d.id);
+            } else {
+                selectedCountries.add(d.id);
+            }
+            updateVisualizations();
         })
         .on('mouseover', function(event, d) {
             const value = dataByCode.get(d.id);
@@ -153,6 +184,7 @@ function createChoroplethMap(selector, geoData, dataByCode, countryByCode, confi
             if (value) {
                 const country = globalData.find(c => c.Code === d.id);
                 let content = `<strong>${name}</strong>`;
+                content += `<div class="detail-row" style="font-size: 11px; font-style: italic;">Click to select/deselect</div>`;
                 content += `<div class="detail-row">${config.name}: ${config.format(value)}</div>`;
                 
                 if (country) {
@@ -246,18 +278,41 @@ function createHistogram(selector, data, attrKey, config) {
         .call(d3.axisLeft(y).tickSize(-width).tickFormat(''));
 
     // bars
-    svg.selectAll('rect')
+    const bars = svg.selectAll('rect')
         .data(bins)
         .enter()
         .append('rect')
-        .attr('class', 'bar')
+        .attr('class', d => {
+            // check if any country in this bin is selected
+            const hasSelected = d.some(country => selectedCountries.has(country.Code));
+            const allSelected = d.every(country => selectedCountries.has(country.Code));
+            if (selectedCountries.size === 0) return 'bar';
+            if (allSelected && d.length > 0) return 'bar selected';
+            if (hasSelected) return 'bar';
+            return 'bar dimmed';
+        })
         .attr('x', d => x(d.x0) + 1)
         .attr('y', d => y(d.length))
         .attr('width', d => Math.max(0, x(d.x1) - x(d.x0) - 1))
         .attr('height', d => height - y(d.length))
+        .on('click', function(event, d) {
+            // toggle selection
+            if (d.length > 0) {
+                const codes = d.map(country => country.Code);
+                const allSelected = codes.every(code => selectedCountries.has(code));
+                
+                if (allSelected) {
+                    codes.forEach(code => selectedCountries.delete(code));
+                } else {
+                    codes.forEach(code => selectedCountries.add(code));
+                }
+                updateVisualizations();
+            }
+        })
         .on('mouseover', function(event, d) {
             let content = `<strong>Range: ${config.format(d.x0)} - ${config.format(d.x1)}</strong>`;
             content += `<div class="detail-row">Countries: ${d.length}</div>`;
+            content += `<div class="detail-row" style="font-size: 11px; font-style: italic;">Click to select/deselect</div>`;
             
             // show country names (limit to 10)
             if (d.length > 0) {
@@ -336,24 +391,35 @@ function createScatterplot(selector, data, attr1, attr2, config1, config2) {
         .call(d3.axisBottom(x).tickSize(-height).tickFormat(''));
 
     // Dots
-    svg.selectAll('circle')
+    const dots = svg.selectAll('circle')
         .data(data)
         .enter()
         .append('circle')
-        .attr('class', 'dot')
+        .attr('class', d => {
+            if (selectedCountries.size === 0) return 'dot';
+            return selectedCountries.has(d.Code) ? 'dot selected' : 'dot dimmed';
+        })
         .attr('cx', d => x(d[attr1]))
         .attr('cy', d => y(d[attr2]))
         .attr('r', 4)
+        .on('click', function(event, d) {
+            // toggle selection
+            if (selectedCountries.has(d.Code)) {
+                selectedCountries.delete(d.Code);
+            } else {
+                selectedCountries.add(d.Code);
+            }
+            updateVisualizations();
+        })
         .on('mouseover', function(event, d) {
-            // Enlarge dot
+            // enlarge dot
             d3.select(this).attr('r', 6);
             
-            // Build tooltip content with all available attributes
             let content = `<strong>${d.Entity}</strong>`;
+            content += `<div class="detail-row" style="font-size: 11px; font-style: italic;">Click to select/deselect</div>`;
             content += `<div class="detail-row">${config1.name}: ${config1.format(d[attr1])}</div>`;
             content += `<div class="detail-row">${config2.name}: ${config2.format(d[attr2])}</div>`;
             
-            // Add other attributes if available and not already shown
             if (d.gdp_per_capita && attr1 !== 'gdp_per_capita' && attr2 !== 'gdp_per_capita') {
                 content += `<div class="detail-row">GDP per Capita: ${attributeConfig.gdp_per_capita.format(d.gdp_per_capita)}</div>`;
             }
@@ -375,6 +441,33 @@ function createScatterplot(selector, data, attr1, attr2, config1, config2) {
             d3.select(this).attr('r', 4);
             hideTooltip();
         });
+
+    // brush for selecting multiple countries
+    const brush = d3.brush()
+        .extent([[0, 0], [width, height]])
+        .on('end', function(event) {
+            if (!event.selection) return; // ignore empty selections
+            
+            const [[x0, y0], [x1, y1]] = event.selection;
+            
+            // find countries within the brush selection
+            selectedCountries.clear();
+            data.forEach(d => {
+                const cx = x(d[attr1]);
+                const cy = y(d[attr2]);
+                if (cx >= x0 && cx <= x1 && cy >= y0 && cy <= y1) {
+                    selectedCountries.add(d.Code);
+                }
+            });
+
+            svg.select('.brush').call(brush.move, null);
+            
+            updateVisualizations();
+        });
+
+    svg.append('g')
+        .attr('class', 'brush')
+        .call(brush);
 
     // X axis
     svg.append('g')
