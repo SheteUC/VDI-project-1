@@ -147,6 +147,8 @@ svg {
 .bar {
     fill: steelblue;
     opacity: 0.8;
+    cursor: pointer;
+    transition: opacity 0.2s;
 }
 
 .bar:hover {
@@ -158,6 +160,8 @@ svg {
     opacity: 0.6;
     stroke: #fff;
     stroke-width: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
 .dot:hover {
@@ -187,24 +191,45 @@ svg {
 
 .tooltip {
     position: absolute;
-    padding: 10px;
-    background: rgba(0, 0, 0, 0.8);
+    padding: 12px 15px;
+    background: rgba(0, 0, 0, 0.9);
     color: white;
-    border-radius: 4px;
-    font-size: 12px;
+    border-radius: 6px;
+    font-size: 13px;
     pointer-events: none;
     opacity: 0;
-    transition: opacity 0.2s;
+    transition: opacity 0.2s ease-in-out;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    max-width: 250px;
+}
+
+.tooltip.visible {
+    opacity: 1;
+}
+
+.tooltip strong {
+    display: block;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #4fc3f7;
+}
+
+.tooltip .detail-row {
+    margin: 3px 0;
 }
 
 .country {
     stroke: #fff;
     stroke-width: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
 .country:hover {
     stroke: #333;
     stroke-width: 1.5px;
+    filter: brightness(0.9);
 }
 
 .legend {

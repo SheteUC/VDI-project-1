@@ -34,6 +34,26 @@ const attributeConfig = {
     }
 };
 
+const tooltip = d3.select('#tooltip');
+
+function showTooltip(content, event) {
+    tooltip
+        .html(content)
+        .classed('visible', true)
+        .style('left', (event.pageX + 15) + 'px')
+        .style('top', (event.pageY - 10) + 'px');
+}
+
+function moveTooltip(event) {
+    tooltip
+        .style('left', (event.pageX + 15) + 'px')
+        .style('top', (event.pageY - 10) + 'px');
+}
+
+function hideTooltip() {
+    tooltip.classed('visible', false);
+}
+
 Promise.all([
     d3.csv('youth_opportunity_level3.csv'),
     d3.json('https://raw.githubusercontent.com/holtzy/D3-graph-gallery/master/DATA/world.geojson')
@@ -116,7 +136,6 @@ function createChoroplethMap(selector, geoData, dataByCode, countryByCode, confi
     const colorScale = d3.scaleSequential(config.colorScheme)
         .domain([0, d3.max(Array.from(dataByCode.values()))]);
 
-    // countries
     svg.selectAll('path')
         .data(geoData.features)
         .enter()
@@ -127,12 +146,36 @@ function createChoroplethMap(selector, geoData, dataByCode, countryByCode, confi
             const value = dataByCode.get(d.id);
             return value ? colorScale(value) : '#ccc';
         })
-        .append('title')
-        .text(d => {
+        .on('mouseover', function(event, d) {
             const value = dataByCode.get(d.id);
             const name = countryByCode.get(d.id) || d.properties.name;
-            return value ? `${name}\n${config.name}: ${config.format(value)}` : `${name}\nNo data`;
-        });
+            
+            if (value) {
+                const country = globalData.find(c => c.Code === d.id);
+                let content = `<strong>${name}</strong>`;
+                content += `<div class="detail-row">${config.name}: ${config.format(value)}</div>`;
+                
+                if (country) {
+                    if (country.gdp_per_capita && attrKey !== 'gdp_per_capita') {
+                        content += `<div class="detail-row">GDP per Capita: ${attributeConfig.gdp_per_capita.format(country.gdp_per_capita)}</div>`;
+                    }
+                    if (country.youth_unemployment && attrKey !== 'youth_unemployment') {
+                        content += `<div class="detail-row">Youth Unemployment: ${attributeConfig.youth_unemployment.format(country.youth_unemployment)}</div>`;
+                    }
+                    if (country.tertiary_education && attrKey !== 'tertiary_education') {
+                        content += `<div class="detail-row">Education Enrollment: ${attributeConfig.tertiary_education.format(country.tertiary_education)}</div>`;
+                    }
+                    if (country.life_expectancy && attrKey !== 'life_expectancy') {
+                        content += `<div class="detail-row">Life Expectancy: ${attributeConfig.life_expectancy.format(country.life_expectancy)}</div>`;
+                    }
+                }
+                showTooltip(content, event);
+            } else {
+                showTooltip(`<strong>${name}</strong><div class="detail-row">No data available</div>`, event);
+            }
+        })
+        .on('mousemove', moveTooltip)
+        .on('mouseout', hideTooltip);
 
     // legend
     const legendWidth = 200;
@@ -212,8 +255,23 @@ function createHistogram(selector, data, attrKey, config) {
         .attr('y', d => y(d.length))
         .attr('width', d => Math.max(0, x(d.x1) - x(d.x0) - 1))
         .attr('height', d => height - y(d.length))
-        .append('title')
-        .text(d => `${config.format(d.x0)} - ${config.format(d.x1)}\nCountries: ${d.length}`);
+        .on('mouseover', function(event, d) {
+            let content = `<strong>Range: ${config.format(d.x0)} - ${config.format(d.x1)}</strong>`;
+            content += `<div class="detail-row">Countries: ${d.length}</div>`;
+            
+            // show country names (limit to 10)
+            if (d.length > 0) {
+                const countryNames = d.map(country => country.Entity).slice(0, 10);
+                content += `<div class="detail-row" style="margin-top: 5px;">` + countryNames.join(', ');
+                if (d.length > 10) {
+                    content += ` +${d.length - 10} more`;
+                }
+                content += `</div>`;
+            }
+            showTooltip(content, event);
+        })
+        .on('mousemove', moveTooltip)
+        .on('mouseout', hideTooltip);
 
     // X axis
     svg.append('g')
@@ -277,7 +335,7 @@ function createScatterplot(selector, data, attr1, attr2, config1, config2) {
         .attr('transform', `translate(0,${height})`)
         .call(d3.axisBottom(x).tickSize(-height).tickFormat(''));
 
-    // dots
+    // Dots
     svg.selectAll('circle')
         .data(data)
         .enter()
@@ -286,8 +344,37 @@ function createScatterplot(selector, data, attr1, attr2, config1, config2) {
         .attr('cx', d => x(d[attr1]))
         .attr('cy', d => y(d[attr2]))
         .attr('r', 4)
-        .append('title')
-        .text(d => `${d.Entity}\n${config1.name}: ${config1.format(d[attr1])}\n${config2.name}: ${config2.format(d[attr2])}`);
+        .on('mouseover', function(event, d) {
+            // Enlarge dot
+            d3.select(this).attr('r', 6);
+            
+            // Build tooltip content with all available attributes
+            let content = `<strong>${d.Entity}</strong>`;
+            content += `<div class="detail-row">${config1.name}: ${config1.format(d[attr1])}</div>`;
+            content += `<div class="detail-row">${config2.name}: ${config2.format(d[attr2])}</div>`;
+            
+            // Add other attributes if available and not already shown
+            if (d.gdp_per_capita && attr1 !== 'gdp_per_capita' && attr2 !== 'gdp_per_capita') {
+                content += `<div class="detail-row">GDP per Capita: ${attributeConfig.gdp_per_capita.format(d.gdp_per_capita)}</div>`;
+            }
+            if (d.youth_unemployment && attr1 !== 'youth_unemployment' && attr2 !== 'youth_unemployment') {
+                content += `<div class="detail-row">Youth Unemployment: ${attributeConfig.youth_unemployment.format(d.youth_unemployment)}</div>`;
+            }
+            if (d.tertiary_education && attr1 !== 'tertiary_education' && attr2 !== 'tertiary_education') {
+                content += `<div class="detail-row">Education Enrollment: ${attributeConfig.tertiary_education.format(d.tertiary_education)}</div>`;
+            }
+            if (d.life_expectancy && attr1 !== 'life_expectancy' && attr2 !== 'life_expectancy') {
+                content += `<div class="detail-row">Life Expectancy: ${attributeConfig.life_expectancy.format(d.life_expectancy)}</div>`;
+            }
+            
+            showTooltip(content, event);
+        })
+        .on('mousemove', moveTooltip)
+        .on('mouseout', function() {
+            // Reset dot size
+            d3.select(this).attr('r', 4);
+            hideTooltip();
+        });
 
     // X axis
     svg.append('g')
