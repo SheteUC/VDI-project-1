@@ -12,7 +12,7 @@ body {
 }
 
 .container {
-    max-width: 1400px;
+    max-width: 1600px;
     margin: 0 auto;
     background-color: white;
     padding: 30px;
@@ -65,14 +65,18 @@ h1 {
 .visualizations {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 30px;
+    gap: 25px;
 }
 
 .viz-container {
     background-color: #fafafa;
-    padding: 20px;
+    padding: 15px;
     border-radius: 6px;
     border: 1px solid #e0e0e0;
+}
+
+.viz-container.map-container {
+    min-height: 400px;
 }
 
 .viz-container.full-width {
@@ -80,9 +84,9 @@ h1 {
 }
 
 .viz-container h2 {
-    font-size: 1.3em;
+    font-size: 1.2em;
     color: #2c3e50;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
     text-align: center;
 }
 
@@ -143,4 +147,24 @@ svg {
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.2s;
+}
+
+.country {
+    stroke: #fff;
+    stroke-width: 0.5px;
+}
+
+.country:hover {
+    stroke: #333;
+    stroke-width: 1.5px;
+}
+
+.legend {
+    font-size: 11px;
+}
+
+.legend-title {
+    font-size: 12px;
+    font-weight: 600;
+    fill: #333;
 }

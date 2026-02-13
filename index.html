@@ -6,6 +6,8 @@
     <title>Youth Opportunity Explorer</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
 </head>
 <body>
     <div class="container">
@@ -13,7 +15,7 @@
             <h1>Youth Opportunity Explorer</h1>
             <p class="author">Created by Athar</p>
             <p class="metadata">
-                Data Year: 2023 | 
+                Data Year: 2024 | 
                 Data Source: <a href="https://ourworldindata.org" target="_blank">Our World in Data</a>
                 (GDP per Capita: World Bank, Youth Unemployment: ILO/World Bank)
             </p>
@@ -24,19 +26,29 @@
         </header>
 
         <div class="visualizations">
-            <!-- Histogram 1: GDP per Capita -->
+            <!-- Top Row: Choropleth Maps -->
+            <div class="viz-container map-container">
+                <h2>GDP per Capita by Country</h2>
+                <svg id="gdp-map"></svg>
+            </div>
+
+            <div class="viz-container map-container">
+                <h2>Youth Unemployment Rate by Country</h2>
+                <svg id="unemployment-map"></svg>
+            </div>
+
+            <!-- Middle Row: Histograms -->
             <div class="viz-container">
                 <h2>Distribution of GDP per Capita</h2>
                 <svg id="gdp-histogram"></svg>
             </div>
 
-            <!-- Histogram 2: Youth Unemployment -->
             <div class="viz-container">
                 <h2>Distribution of Youth Unemployment Rate</h2>
                 <svg id="unemployment-histogram"></svg>
             </div>
 
-            <!-- Scatterplot: Correlation -->
+            <!-- Bottom Row: Scatterplot -->
             <div class="viz-container full-width">
                 <h2>GDP per Capita vs Youth Unemployment Rate</h2>
                 <svg id="correlation-scatterplot"></svg>
