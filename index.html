@@ -15,42 +15,63 @@
             <h1>Youth Opportunity Explorer</h1>
             <p class="author">Created by Athar</p>
             <p class="metadata">
-                Data Year: 2024 | 
+                Data Year: 2023 | 
                 Data Source: <a href="https://ourworldindata.org" target="_blank">Our World in Data</a>
-                (GDP per Capita: World Bank, Youth Unemployment: ILO/World Bank)
+                (GDP: World Bank, Education: UNESCO, Unemployment: ILO, Life Expectancy: WHO)
             </p>
             <p class="description">
-                Explore economic opportunity and job markets for young people across the world. 
-                This visualization helps those considering moving to a new country after graduation.
+                Explore youth opportunity indicators across the world. 
+                Select different attributes to compare and discover which countries offer the best prospects for young people.
             </p>
         </header>
 
+        <div class="controls">
+            <div class="control-group">
+                <label for="attribute1-select">Primary Attribute:</label>
+                <select id="attribute1-select">
+                    <option value="gdp_per_capita" selected>GDP per Capita (USD)</option>
+                    <option value="youth_unemployment">Youth Unemployment Rate (%)</option>
+                    <option value="tertiary_education">Tertiary Education Enrollment (%)</option>
+                    <option value="life_expectancy">Life Expectancy (years)</option>
+                </select>
+            </div>
+            <div class="control-group">
+                <label for="attribute2-select">Secondary Attribute:</label>
+                <select id="attribute2-select">
+                    <option value="gdp_per_capita">GDP per Capita (USD)</option>
+                    <option value="youth_unemployment" selected>Youth Unemployment Rate (%)</option>
+                    <option value="tertiary_education">Tertiary Education Enrollment (%)</option>
+                    <option value="life_expectancy">Life Expectancy (years)</option>
+                </select>
+            </div>
+        </div>
+
         <div class="visualizations">
-            <!-- Top Row: Choropleth Maps -->
+            <!-- Choropleth Maps -->
             <div class="viz-container map-container">
-                <h2>GDP per Capita by Country</h2>
-                <svg id="gdp-map"></svg>
+                <h2 id="map1-title">GDP per Capita by Country</h2>
+                <svg id="map1"></svg>
             </div>
 
             <div class="viz-container map-container">
-                <h2>Youth Unemployment Rate by Country</h2>
-                <svg id="unemployment-map"></svg>
+                <h2 id="map2-title">Youth Unemployment Rate by Country</h2>
+                <svg id="map2"></svg>
             </div>
 
-            <!-- Middle Row: Histograms -->
+            <!-- Histograms -->
             <div class="viz-container">
-                <h2>Distribution of GDP per Capita</h2>
-                <svg id="gdp-histogram"></svg>
+                <h2 id="hist1-title">Distribution of GDP per Capita</h2>
+                <svg id="histogram1"></svg>
             </div>
 
             <div class="viz-container">
-                <h2>Distribution of Youth Unemployment Rate</h2>
-                <svg id="unemployment-histogram"></svg>
+                <h2 id="hist2-title">Distribution of Youth Unemployment Rate</h2>
+                <svg id="histogram2"></svg>
             </div>
 
-            <!-- Bottom Row: Scatterplot -->
+            <!-- Scatterplot -->
             <div class="viz-container full-width">
-                <h2>GDP per Capita vs Youth Unemployment Rate</h2>
+                <h2 id="scatter-title">GDP per Capita vs Youth Unemployment Rate</h2>
                 <svg id="correlation-scatterplot"></svg>
             </div>
         </div>
