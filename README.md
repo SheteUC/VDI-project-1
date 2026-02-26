@@ -57,9 +57,10 @@ The interactive selection feature lets you explore specific groups of countries 
 
 **Code + access:**
 
-- GitHub repo: https://github.com/SheteUC/VDI-project-1
 - Live app on GitHub Pages: https://sheteuc.github.io/VDI-project-1/
 - How to run locally: Clone the repository, then open `index.html` with a local web server (e.g., VS Code Live Server extension, or `python -m http.server`). Opening the HTML file directly in a browser may cause CORS issues when loading the CSV data.
+
+**Demo Link** -> https://1drv.ms/v/c/ac11ea8bde0a5031/IQBFoZc4hg7aQ7V7OdXvhRlBAVQdta8S1C1j_OrIvDdW8RY?e=in6e53
 
 **Challenges + future work:**
 
